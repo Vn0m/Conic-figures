@@ -47,21 +47,6 @@ Xe = Xe[ind]
 Ye = Ye[ind]
 Ze = Ze[ind]
 
-# Plot the intersection curve as an ellipse and a parabola
-ellipse = ax.plot(Xe, Ye, Ze-Ye-0.4, color='r', label='ellipse')
-parabola = ax.plot(Xe, Ye, Ze-Xe-Ye-0.6, color='orange', label='parabola')
-
-# Define the circle
-theta = np.linspace(0, 2*np.pi, 100)
-xc = 0.8 * np.sqrt(h**0.8) * np.cos(theta)  # smaller radius
-yc = 0.8 * np.sqrt(h**0.8) * np.sin(theta)  # smaller radius
-zc = np.ones_like(theta) + 1.2*h        # shift z-axis up by 1.2*h
-
-# plot circle
-circle, = ax.plot(xc, yc, zc, color='blue', linewidth=2, zorder=10, label='circle')
-circle.set_color('blue')
-
-
 
 ax.set_xlim([-1, 1])
 ax.set_ylim([-1, 1])

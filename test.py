@@ -1,51 +1,77 @@
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
 import numpy as np
-from scipy.special import erf
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
+# Create figure and axis
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
-X = np.arange(0, 6, 0.25)
-Y = np.arange(0, 6, 0.25)
-X, Y = np.meshgrid(X, Y)
+# Define cone parameters
+r = 1
+h = 2
 
-Z1 = np.empty_like(X)
-Z2 = np.empty_like(X)
-C1 = np.empty_like(X, dtype=object)
-C2 = np.empty_like(X, dtype=object)
+# Define the surfaces of the cones
+u = np.linspace(0, 2*np.pi, 30)
+v = np.linspace(0, h, 30)
+U, V = np.meshgrid(u, v)
 
-for i in range(len(X)):
-  for j in range(len(X[0])):
-    z1 = 0.5*(erf((X[i,j]+Y[i,j]-4.5)*0.5)+1)
-    z2 = 0.5*(erf((-X[i,j]-Y[i,j]+4.5)*0.5)+1)
-    Z1[i,j] = z1
-    Z2[i,j] = z2
+X1 = r * (1 - V/h) * np.cos(U)
+Y1 = r * (1 - V/h) * np.sin(U)
+Z1 = V
 
-    # If you want to grab a colour from a matplotlib cmap function, 
-    # you need to give it a number between 0 and 1. z1 and z2 are 
-    # already in this range, so it just works.
-    C1[i,j] = plt.get_cmap("Oranges")(z1)
-    C2[i,j] = plt.get_cmap("Blues")(z2)
+X2 = r * (1 - V/h) * np.cos(U)
+Y2 = r * (1 - V/h) * np.sin(U)
+Z2 = 2*h - V
 
+# Combine the surfaces into a single plot
+X = np.concatenate((X1, X2))
+Y = np.concatenate((Y1, Y2))
+Z = np.concatenate((Z1, Z2))
+ax.plot_surface(X, Y, Z, cmap='viridis')
 
-# Create a transparent bridge region
-X_bridge = np.vstack([X[-1,:],X[-1,:]])
-Y_bridge = np.vstack([Y[-1,:],Y[-1,:]])
-Z_bridge = np.vstack([Z1[-1,:],Z2[-1,:]])
-color_bridge = np.empty_like(Z_bridge, dtype=object)
+# Define the surface of the plane
+x = np.linspace(-1, 1, 30)
+y = np.linspace(-1, 1, 30)
+Xp, Yp = np.meshgrid(x, y)
+Zp = Xp + Yp + 2
 
-color_bridge.fill((1,1,1,0)) # RGBA colour, onlt the last component matters.
+# Plot the plane
+ax.plot_surface(Xp, Yp, Zp, alpha=0.5, cmap='Blues')
 
-# Join the two surfaces flipping one of them (using also the bridge)
-X_full = np.vstack([X, X_bridge, np.flipud(X)])
-Y_full = np.vstack([Y, Y_bridge, np.flipud(Y)])
-Z_full = np.vstack([Z1, Z_bridge, np.flipud(Z2)])
-color_full = np.vstack([C1, color_bridge, np.flipud(C2)])
+# Find the intersection of the plane with the double cone
+k = (2 * h) / (2 * h + 1)
+Xe = k * Xp
+Ye = k * Yp
+Ze = Zp
+ind = np.where((Xe**2 + Ye**2) < (h**2))
+Xe = Xe[ind]
+Ye = Ye[ind]
+Ze = Ze[ind]
 
-surf_full = ax.plot_surface(X_full, Y_full, Z_full, rstride=1, cstride=1,
-                            facecolors=color_full, linewidth=0,
-                            antialiased=False)
+# Plot the intersection curve as an ellipse and a parabola
+ellipse = ax.plot(Xe, Ye, Ze-Ye-0.4, color='r', label='ellipse')
+parabola = ax.plot(Xe, Ye, Ze-Xe-Ye-0.6, color='orange', label='parabola')
 
+# Define the circle
+theta = np.linspace(0, 2*np.pi, 100)
+xc = 0.8 * np.sqrt(h**0.8) * np.cos(theta)  # smaller radius
+yc = 0.8 * np.sqrt(h**0.8) * np.sin(theta)  # smaller radius
+zc = np.ones_like(theta) + 1.2*h        # shift z-axis up by 1.2*h
 
+# Plot the circle
+circle, = ax.plot(xc, yc, zc, color='blue', linewidth=2, zorder=10, label='circle')
+circle.set_color('blue')
+
+# Set axis limits and labels
+ax.set_xlim([-1, 1])
+ax.set_ylim([-1, 1])
+ax.set_zlim([1, 2*h])
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
+
+# Add legend
+ax.legend()
+
+# Show the plot
 plt.show()
