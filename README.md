@@ -19,17 +19,14 @@ Welcome to the Conic Figures Program repository! This repository contains a Pyth
 ## Getting Started
 Clone the repository:
 
-    ```bash
     git clone https://github.com/Vn0m/Conic-figures.git
-    
+
 Navigate to the program directory:
 
-    ```bash
     cd Conic-figures
     
 Run the program:
 
-    ```bash
     python conic_figures.py
     
 
@@ -48,3 +45,4 @@ Contributions are welcome! If you have ideas for additional features or improvem
 
 ## Contact
 For any inquiries or suggestions, feel free to reach out to me on discord: vnom.
+
